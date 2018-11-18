@@ -3,3 +3,5 @@ src/static/images/*
 *.pyc
 *.pyo
 *.txt
+*.png
+*.gv

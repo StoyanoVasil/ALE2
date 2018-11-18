@@ -25,11 +25,19 @@ def parse_transition(initial_state, transition_state, states):
     dot.edge(states[initial[0]].id, states[transition_state].id, initial[1])
     states[initial[0]].add_transition(initial[1], states[transition_state])
 
+def check_if_dfa(states, alphabet):
+    for key, value in states.items():
+        if len(value.transitions.keys()) != len(alphabet): return False
+        if ''.join(sorted(value.transitions.keys())) != ''.join(sorted(alphabet)): return False
+        for transition in value.transitions.values():
+            if len(transition) != 1: return False
+    return True
 
 if __name__ == '__main__':
     alphabet = None
     states = None
     dot = Digraph()
+    is_dfa = True
     with open('./nfa.txt', 'r') as file:
         transitions_marker = False
         for line in file:
@@ -45,8 +53,12 @@ if __name__ == '__main__':
             elif transitions_marker:
                 l = line.strip().split(' ')
                 parse_transition(l[0], l[2], states)
+                if l[0].split(',')[1] == '_': is_dfa = False
+    if is_dfa:
+        is_dfa = check_if_dfa(states, alphabet)
     aut = Automaton(alphabet, list(states.values())[0])
-    print(aut.initial_state.transitions['a'][0].transitions)
     dot.save('./test.gv')
     (graph, ) = pydot.graph_from_dot_file('./test.gv')
     graph.write_png('./test.png')
+
+    print(is_dfa)
