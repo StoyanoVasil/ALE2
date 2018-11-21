@@ -1,4 +1,19 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1>Hello ALE2!</h1>
+    <nav class="navbar navbar-light bg-light w-100">
+        <div class="navbar-brand">
+            <img src="{{ url_for('static', filename='pics/logo.png') }}" alt="logo" id="logo">
+        </div>
+    </nav>
+    <div class="cont">
+        <div class="left split d-flex flex-column">
+            <h3 class="top-space">Input text:</h3>
+            <textarea class="top-space" name="input" id="input" cols="80" rows="20"></textarea>
+            <button class="btn btn-success top-space" id="submit">Submit</button>
+        </div>
+        <div class="right split">
+            <h3 id="aut-type"></h3>
+            <img src="" alt="" id="aut-img">
+        </div>
+    </div>
 {% endblock %}

@@ -1,5 +1,3 @@
-from graphviz import Digraph
-
 
 class Automaton:
 

@@ -1,8 +1,8 @@
 from graphviz import Digraph
 import pydot
 
-from models.Automaton import Automaton
-from models.State import State
+from src.models.Automaton import Automaton
+from src.models.State import State
 
 
 def skip(line):
@@ -54,39 +54,38 @@ def _add_transitions(states, dot):
                 dot.edge(value.id, transition.id, k)
 
 
-if __name__ == '__main__':
+def parse(text):
     alphabet = None
     states = None
     dot = Digraph()
     is_dfa = True
-    with open('./nfa.txt', 'r') as file:
-        transitions_marker = False
-        for line in file:
-            # remove whitespaces in beginning and end; reduce multiple whitespaces to one
-            line = ' '.join(line.split())
+    transitions_marker = False
+    for line in text.split('\n'):
+        # remove whitespaces in beginning and end; reduce multiple whitespaces to one
+        line = ' '.join(line.split())
 
-            # ignore comments and empty lines
-            if skip(line): continue
+        # ignore comments and empty lines
+        if skip(line): continue
 
-            # stop if end of file
-            if line.strip() == 'end.': break
+        # stop if end of file
+        if line.strip() == 'end.': break
 
-            # handle line
-            if line.startswith('alphabet:'): alphabet = parse_alphabet(line)
-            elif line.startswith('states:'): states = parse_states(line, dot)
-            elif line.startswith('final:'): parse_final(line, states)
-            elif line.startswith('transitions:'): transitions_marker = True
-            elif transitions_marker:
-                l = line.split(' ')
-                parse_transition(l[0], l[2], states, dot)
-                if l[0].split(',')[1] == '_': is_dfa = False
-        generate_dot(states, dot)
+        # handle line
+        if line.startswith('alphabet:'): alphabet = parse_alphabet(line)
+        elif line.startswith('states:'): states = parse_states(line, dot)
+        elif line.startswith('final:'): parse_final(line, states)
+        elif line.startswith('transitions:'): transitions_marker = True
+        elif transitions_marker:
+            l = line.split(' ')
+            parse_transition(l[0], l[2], states, dot)
+            if l[0].split(',')[1] == '_': is_dfa = False
 
     if is_dfa:
         is_dfa = check_if_dfa(states, alphabet)
+    generate_dot(states, dot)
     aut = Automaton(alphabet, list(states.values())[0])
-    dot.save('./test.gv')
-    (graph, ) = pydot.graph_from_dot_file('./test.gv')
-    graph.write_png('./test.png')
-
-    print(is_dfa)
+    name = str(id(aut))
+    dot.save(f'src/static/pics/{name}.gv')
+    (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
+    graph.write_png(f'src/static/pics/{name}.png')
+    return (name, is_dfa)
