@@ -6,14 +6,23 @@
         </div>
     </nav>
     <div class="cont">
-        <div class="left split d-flex flex-column">
+        <div class="split d-flex flex-column">
             <h3 class="top-space">Input text:</h3>
             <textarea class="top-space" name="input" id="input" cols="80" rows="20"></textarea>
             <button class="btn btn-success top-space" id="submit">Submit</button>
         </div>
-        <div class="right split">
-            <h3 id="aut-type"></h3>
-            <img src="" alt="" id="aut-img">
+        <div class="split d-flex flex-row">
+            <div class="split">
+                <h3 id="aut-type"></h3>
+                <img src="" alt="" id="aut-img">
+            </div>
+            <div class="split" id="list-container">
+{#                <ul class="list-group">#}
+{#                    <li class="list-group-item list-group-item-success">abcb,y</li>#}
+{#                    <li class="list-group-item list-group-item-success">abcb,y</li>#}
+{#                    <li class="list-group-item list-group-item-success">abcb,y</li>#}
+{#                </ul>#}
+            </div>
         </div>
     </div>
 {% endblock %}

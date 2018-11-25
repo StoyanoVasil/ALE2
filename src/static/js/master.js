@@ -15,8 +15,23 @@ document.getElementById("submit").addEventListener("click", function () {
 request.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
         var json = JSON.parse(this.responseText);
-        console.log(json);
+        // console.log(json);
         document.getElementById("aut-img").src = "../static/pics/" + json["img"] + ".png";
         document.getElementById("aut-type").innerText = "DFA: " + json["dfa"].toString();
+        document.getElementById("list-container").innerHTML = returnListItems(json["words"]);
     }
 };
+
+function returnListItems(array) {
+
+    list_items = "";
+    for(var i = 0; i < array.length; i++){
+        var el = array[i];
+        if(el[1]) {
+            list_items = list_items + '<li class="list-group-item list-group-item-success">' + el[0] + '</li>';
+        } else {
+            list_items = list_items + '<li class="list-group-item list-group-item-danger">' + el[0] + '</li>';
+        }
+    }
+    return '<ul class="list-group">' + list_items + '</ul>';
+}
