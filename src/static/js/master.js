@@ -28,9 +28,9 @@ function returnListItems(array) {
     for(var i = 0; i < array.length; i++){
         var el = array[i];
         if(el[1]) {
-            list_items = list_items + '<li class="list-group-item list-group-item-success">' + el[0] + '</li>';
+            list_items += '<li class="list-group-item list-group-item-success">' + el[0] + '</li>';
         } else {
-            list_items = list_items + '<li class="list-group-item list-group-item-danger">' + el[0] + '</li>';
+            list_items += '<li class="list-group-item list-group-item-danger">' + el[0] + '</li>';
         }
     }
     return '<ul class="list-group">' + list_items + '</ul>';
