@@ -8,6 +8,7 @@ from src.models.State import State
 def skip(line):
     if line.startswith('#'): return True
     if line.startswith('\n'): return True
+    if len(line) == 0: return True
 
 def parse_alphabet(line):
     return line.split(' ')[1]
@@ -60,6 +61,9 @@ def parse(text):
     dot = Digraph()
     is_dfa = True
     transitions_marker = False
+    words_marker = False
+    words = []
+    evaluations = []
     for line in text.split('\n'):
         # remove whitespaces in beginning and end; reduce multiple whitespaces to one
         line = ' '.join(line.split())
@@ -74,18 +78,33 @@ def parse(text):
         if line.startswith('alphabet:'): alphabet = parse_alphabet(line)
         elif line.startswith('states:'): states = parse_states(line, dot)
         elif line.startswith('final:'): parse_final(line, states)
-        elif line.startswith('transitions:'): transitions_marker = True
+        elif line.startswith('transitions:'):
+            transitions_marker = True
+        elif line.startswith('words:'):
+            transitions_marker = False
+            words_marker = True
         elif transitions_marker:
             l = line.split(' ')
             parse_transition(l[0], l[2], states, dot)
             if l[0].split(',')[1] == '_': is_dfa = False
+        elif words_marker:
+            l = line.split(',')
+            words.append((l[0], l[1]))
 
+    aut = Automaton(alphabet, list(states.values())[0])
     if is_dfa:
         is_dfa = check_if_dfa(states, alphabet)
+    for word in words:
+        accepted = aut.evaluate_word(word[0])
+        if accepted:
+            if word[1] == 'y': evaluations.append([','.join(word), True])
+            else: evaluations.append([','.join(word), False])
+        else:
+            if word[1] == 'y': evaluations.append([','.join(word), False])
+            else: evaluations.append([','.join(word), True])
     generate_dot(states, dot)
-    aut = Automaton(alphabet, list(states.values())[0])
     name = str(id(aut))
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
     graph.write_png(f'src/static/pics/{name}.png')
-    return (name, is_dfa)
+    return [name, is_dfa, evaluations]

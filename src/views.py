@@ -11,5 +11,5 @@ def index():
 @app.route('/generate', methods=['POST'])
 def generate():
     data = request.json
-    name, is_dfa = parse(data['text'])
-    return Response(json.dumps({'img': name, 'dfa': is_dfa}))
+    args = parse(data['text'])
+    return Response(json.dumps({'img': args[0], 'dfa': args[1], 'words': args[2]}))
