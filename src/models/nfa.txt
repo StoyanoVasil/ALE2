@@ -1,0 +1,37 @@
+# test 1
+alphabet: abc
+states: A1,A2,A3
+final: A3
+transitions:
+A1,a --> A2
+A1,b --> A3
+A1,c --> A1
+A2,a --> A3
+A2,b --> A3
+A2,c --> A3
+A3,a --> A3
+A3,b --> A3
+A3,c --> A3
+words:
+abc,y
+aa,y
+end.
+
+# test2
+alphabet: abc
+states: A1,A2,A3,A4
+final: A4
+transitions:
+A1,_ --> A4
+A1,_ --> A2
+A2,_ --> A1
+A2,a --> A3
+A2,b --> A4
+A3,a --> A4
+A4,a --> A4
+A4,b --> A3
+words:
+a,y
+ab,n
+bba,y
+end.
