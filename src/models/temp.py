@@ -52,7 +52,8 @@ def _add_transitions(states, dot):
     for key, value in states.items():
         for k, v in value.transitions.items():
             for transition in v:
-                dot.edge(value.id, transition.id, k)
+                if k is '_': dot.edge(value.id, transition.id, 'ε')
+                else: dot.edge(value.id, transition.id, k)
 
 
 def parse(text):
@@ -84,6 +85,7 @@ def parse(text):
             transitions_marker = False
             words_marker = True
         elif transitions_marker:
+            print(line)
             l = line.split(' ')
             parse_transition(l[0], l[2], states, dot)
             if l[0].split(',')[1] == '_': is_dfa = False
