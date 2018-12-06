@@ -35,3 +35,22 @@ a,y
 ab,n
 bba,y
 end.
+
+# test3
+# aa*b + aa*
+alphabet: ab
+states: O,P,Q,R,S,T,U,V,W,X
+final: S,X
+transitions:
+O,_ --> P
+O,_ --> V
+P,_ --> Q
+Q,_ --> R
+R,a --> S
+R,_ --> T
+S,_ --> R
+T,_ --> U
+U,_ --> O
+V,a --> W
+W,b --> X
+end.

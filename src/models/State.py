@@ -57,6 +57,6 @@ class State:
                 state.get_all_words(word=word, words=words)
         for k in self.transitions.keys():
             if k is not '_':
+                temp = word + k
                 for state in self.transitions[k]:
-                    temp = word + k
                     state.get_all_words(word=temp, words=words)

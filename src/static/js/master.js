@@ -5,6 +5,8 @@ document.getElementById("submit").addEventListener("click", function () {
     if (text.length < 1) {
         alert("Please provide input!");
     } else {
+        document.getElementById("list-possible-words").style.display = "none";
+        document.getElementById("list-container").style.display = "none";
         json = JSON.stringify({"text": text});
         request.open("POST", "/generate", true);
         request.setRequestHeader("Content-Type", "application/json");
@@ -22,6 +24,7 @@ request.onreadystatechange = function () {
         list.innerHTML = returnListItems(json["words"]);
         list.style.display = "block";
         if(json["finite"]) {
+            console.log(json["possible_words"]);
             var words = document.getElementById("list-possible-words");
             words.innerHTML = returnPossibleWords(json["possible_words"]);
             words.style.display = "block";
@@ -47,7 +50,7 @@ function returnPossibleWords(array) {
     list_items = "";
     for(var i = 0; i < array.length; i++){
         var el = array[i];
-        list_items += '<li class="list-group-item list-group-item-primary">' + el[0] + '</li>';
+        list_items += '<li class="list-group-item list-group-item-primary">' + el + '</li>';
     }
     return '<h3>Possible Words:</h3><ul class="list-group">' + list_items + '</ul>';
 }
