@@ -30,3 +30,17 @@ class State:
             for state in self.transitions[word[0]]:
                 if state.evaluate_word(word[1:]): return True
         return False
+
+    def is_finite(self, states=None):
+        if states is None: states = []
+        if self not in states:
+            states.append(self)
+            if '_' in self.transitions:
+                for state in self.transitions['_']:
+                    if state == self: continue
+                    if not state.is_finite(states=states): return False
+            for k in self.transitions.keys():
+                for state in self.transitions[k]:
+                    if not state.is_finite(states=states): return False
+            return True
+        else: return False

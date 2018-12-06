@@ -10,3 +10,6 @@ class Automaton:
 
     def evaluate_word(self, word):
         return self.initial_state.evaluate_word(word)
+
+    def is_finite(self):
+        return self.initial_state.is_finite()

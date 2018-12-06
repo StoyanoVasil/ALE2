@@ -12,4 +12,4 @@ def index():
 def generate():
     data = request.json
     args = parse(data['text'])
-    return Response(json.dumps({'img': args[0], 'dfa': args[1], 'words': args[2]}))
+    return Response(json.dumps({'img': args[0], 'dfa': args[1], 'words': args[2], 'finite': args[3]}))

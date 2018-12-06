@@ -40,6 +40,7 @@ def check_if_dfa(states, alphabet):
     return True
 
 def generate_dot(states, dot):
+    # dot.attr(rankdir='LR')
     _add_states(states, dot)
     _add_transitions(states, dot)
 
@@ -85,7 +86,6 @@ def parse(text):
             transitions_marker = False
             words_marker = True
         elif transitions_marker:
-            print(line)
             l = line.split(' ')
             parse_transition(l[0], l[2], states, dot)
             if l[0].split(',')[1] == '_': is_dfa = False
@@ -105,8 +105,10 @@ def parse(text):
             if word[1] == 'y': evaluations.append([','.join(word), False])
             else: evaluations.append([','.join(word), True])
     generate_dot(states, dot)
+    finite = aut.is_finite()
+    print(finite)
     name = str(id(aut))
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
     graph.write_png(f'src/static/pics/{name}.png')
-    return [name, is_dfa, evaluations]
+    return [name, is_dfa, evaluations, finite]

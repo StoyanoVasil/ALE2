@@ -15,9 +15,9 @@ document.getElementById("submit").addEventListener("click", function () {
 request.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
         var json = JSON.parse(this.responseText);
-        // console.log(json);
         document.getElementById("aut-img").src = "../static/pics/" + json["img"] + ".png";
         document.getElementById("aut-type").innerText = "DFA: " + json["dfa"].toString();
+        document.getElementById("finite").innerText = "Finite: " + json["finite"].toString();
         document.getElementById("list-container").innerHTML = returnListItems(json["words"]);
     }
 };
