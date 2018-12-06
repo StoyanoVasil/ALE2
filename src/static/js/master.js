@@ -18,7 +18,14 @@ request.onreadystatechange = function () {
         document.getElementById("aut-img").src = "../static/pics/" + json["img"] + ".png";
         document.getElementById("aut-type").innerText = "DFA: " + json["dfa"].toString();
         document.getElementById("finite").innerText = "Finite: " + json["finite"].toString();
-        document.getElementById("list-container").innerHTML = returnListItems(json["words"]);
+        var list = document.getElementById("list-container");
+        list.innerHTML = returnListItems(json["words"]);
+        list.style.display = "block";
+        if(json["finite"]) {
+            var words = document.getElementById("list-possible-words");
+            words.innerHTML = returnPossibleWords(json["possible_words"]);
+            words.style.display = "block";
+        }
     }
 };
 
@@ -33,5 +40,14 @@ function returnListItems(array) {
             list_items += '<li class="list-group-item list-group-item-danger">' + el[0] + '</li>';
         }
     }
-    return '<ul class="list-group">' + list_items + '</ul>';
+    return '<h3>Words check:</h3><ul class="list-group">' + list_items + '</ul>';
+}
+
+function returnPossibleWords(array) {
+    list_items = "";
+    for(var i = 0; i < array.length; i++){
+        var el = array[i];
+        list_items += '<li class="list-group-item list-group-item-primary">' + el[0] + '</li>';
+    }
+    return '<h3>Possible Words:</h3><ul class="list-group">' + list_items + '</ul>';
 }

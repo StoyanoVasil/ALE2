@@ -13,3 +13,8 @@ class Automaton:
 
     def is_finite(self):
         return self.initial_state.is_finite()
+
+    def get_all_words(self):
+        words = []
+        self.initial_state.get_all_words(words)
+        return words

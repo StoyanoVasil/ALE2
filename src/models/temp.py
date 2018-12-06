@@ -106,9 +106,11 @@ def parse(text):
             else: evaluations.append([','.join(word), True])
     generate_dot(states, dot)
     finite = aut.is_finite()
-    print(finite)
+    possible_words = []
+    if finite:
+        possible_words = aut.get_all_words()
     name = str(id(aut))
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
     graph.write_png(f'src/static/pics/{name}.png')
-    return [name, is_dfa, evaluations, finite]
+    return [name, is_dfa, evaluations, finite, possible_words]

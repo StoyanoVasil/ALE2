@@ -32,15 +32,31 @@ class State:
         return False
 
     def is_finite(self, states=None):
-        if states is None: states = []
-        if self not in states:
-            states.append(self)
+        if states is None: temp = []
+        else: temp = states[:]
+        if self not in temp:
+            temp.append(self)
             if '_' in self.transitions:
                 for state in self.transitions['_']:
                     if state == self: continue
-                    if not state.is_finite(states=states): return False
+                    if not state.is_finite(states=temp): return False
             for k in self.transitions.keys():
-                for state in self.transitions[k]:
-                    if not state.is_finite(states=states): return False
+                if k is not '_':
+                    for state in self.transitions[k]:
+                        if not state.is_finite(states=temp): return False
             return True
         else: return False
+
+    def get_all_words(self, words, word=None):
+        if word is None: word = ''
+        if self.is_final:
+            words.append(word)
+        if '_' in self.transitions:
+            for state in self.transitions['_']:
+                if state == self: continue
+                state.get_all_words(word=word, words=words)
+        for k in self.transitions.keys():
+            if k is not '_':
+                for state in self.transitions[k]:
+                    temp = word + k
+                    state.get_all_words(word=temp, words=words)
