@@ -24,7 +24,6 @@ request.onreadystatechange = function () {
         list.innerHTML = returnListItems(json["words"]);
         list.style.display = "block";
         if(json["finite"]) {
-            console.log(json["possible_words"]);
             var words = document.getElementById("list-possible-words");
             words.innerHTML = returnPossibleWords(json["possible_words"]);
             words.style.display = "block";
@@ -47,9 +46,12 @@ function returnListItems(array) {
 }
 
 function returnPossibleWords(array) {
+    var textarea = document.getElementById("input");
+    textarea.value += "\n\nPossible words:\n";
     list_items = "";
     for(var i = 0; i < array.length; i++){
         var el = array[i];
+        textarea.value += el + "\n";
         list_items += '<li class="list-group-item list-group-item-primary">' + el + '</li>';
     }
     return '<h3>Possible Words:</h3><ul class="list-group">' + list_items + '</ul>';

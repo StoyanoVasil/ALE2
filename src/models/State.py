@@ -31,23 +31,37 @@ class State:
                 if state.evaluate_word(word[1:]): return True
         return False
 
-    def is_finite(self, states=None):
-        if states is None: temp = []
-        else: temp = states[:]
-        if self not in temp:
-            temp.append(self)
+    def is_finite(self, states=None, consumed=None):
+        # TODO: empty transitions bug
+        if states is None:
+            tempStates = []
+        else:
+            tempStates = states[:]
+        if consumed is None:
+            tempConsumed = []
+        else:
+            tempConsumed = consumed[:]
+        if self not in tempStates:
+            tempStates.append(self)
             if '_' in self.transitions:
                 for state in self.transitions['_']:
                     if state == self: continue
-                    if not state.is_finite(states=temp): return False
+                    tempConsumed.append(('_', self))
+                    if not state.is_finite(states=tempStates, consumed=tempConsumed): return False
             for k in self.transitions.keys():
                 if k is not '_':
                     for state in self.transitions[k]:
-                        if not state.is_finite(states=temp): return False
+                        tempConsumed.append((k, self))
+                        if not state.is_finite(states=tempStates, consumed=tempConsumed): return False
             return True
-        else: return False
+        else:
+            for tuple in reversed(tempConsumed):
+                if tuple[0] is not '_': return False
+                if tuple[1] == self: break
+            return True
 
     def get_all_words(self, words, word=None):
+        # TODO: fix infinite loop when there is empty transition loop
         if word is None: word = ''
         if self.is_final:
             words.append(word)
