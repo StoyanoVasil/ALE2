@@ -54,3 +54,18 @@ U,_ --> O
 V,a --> W
 W,b --> X
 end.
+
+# test4
+alphabet: a
+states: A1,A2,A3,A4
+final: A4
+transitions:
+A1,_ --> A2
+A2,_ --> A3
+A3,_ --> A1
+A1,a --> A4
+words:
+a,y
+ab,n
+bba,n
+end.

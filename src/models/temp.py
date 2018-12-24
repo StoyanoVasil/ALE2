@@ -108,8 +108,8 @@ def parse(text):
     if is_dfa: finite = False
     else: finite = aut.is_finite()
     possible_words = []
-    # if finite:
-    #     possible_words = aut.get_all_words()
+    if finite:
+        possible_words = aut.get_all_words()
     name = str(id(aut))
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
