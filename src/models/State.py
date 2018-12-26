@@ -3,7 +3,7 @@ class State:
 
     def __init__(self, name):
         self.id = str(id(self))
-        self.name = name
+        self.name = str(name)
         self.is_final = False
         self.transitions = {}
 

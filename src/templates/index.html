@@ -7,8 +7,16 @@
     </nav>
     <div class="cont">
         <div class="split d-flex flex-column">
+            <h3 class="top-space">Regex:</h3>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="*(|(a.b,*(c)))"
+                       aria-label="Recipient's username" aria-describedby="button-addon2" id="regex-input">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-success" type="button" id="regex">Generate</button>
+                </div>
+            </div>
             <h3 class="top-space">Input text:</h3>
-            <textarea class="top-space" name="input" id="input" cols="80" rows="20"></textarea>
+            <textarea class="top-space" name="input" id="input" cols="80" rows="13"></textarea>
             <button class="btn btn-success top-space" id="submit">Submit</button>
         </div>
         <div class="split d-flex flex-row">

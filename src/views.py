@@ -1,7 +1,8 @@
 from flask import render_template, request, Response, json
 from src import app
 
-from src.models.temp import parse
+from src.models.InputParser import parse
+from src.models.RegexParser import parse_regex
 
 
 @app.route('/')
@@ -15,3 +16,9 @@ def generate():
     return Response(json.dumps({'img': args[0], 'dfa': args[1], 'words': args[2],
                                 'finite': args[3], 'possible_words': args[4]}))
 
+@app.route('/regex', methods=['POST'])
+def regex():
+    data = request.json
+    args = parse_regex(data['regex'])
+    return Response(json.dumps({'img': args[0], 'dfa': args[1], 'words': args[2],
+                                'finite': args[3], 'possible_words': args[4]}))

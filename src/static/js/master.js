@@ -14,6 +14,20 @@ document.getElementById("submit").addEventListener("click", function () {
     }
 });
 
+document.getElementById("regex").addEventListener("click", function () {
+    var text = document.getElementById("regex-input").value;
+    if (text.length < 1) {
+        alert("Please provide input!");
+    } else {
+        document.getElementById("list-possible-words").style.display = "none";
+        document.getElementById("list-container").style.display = "none";
+        json = JSON.stringify({"regex": text});
+        request.open("POST", "/regex", true);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send(json);
+    }
+});
+
 request.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
         var json = JSON.parse(this.responseText);
