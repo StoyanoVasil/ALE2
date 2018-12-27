@@ -61,6 +61,7 @@ def parse(text):
     alphabet = None
     states = None
     dot = Digraph()
+    dot.attr(rankdir='TB')
     is_dfa = True
     transitions_marker = False
     words_marker = False
@@ -111,6 +112,11 @@ def parse(text):
     if finite:
         possible_words = aut.get_all_words()
     name = str(id(aut))
+
+    # begging arrow
+    dot.node('arr', '', shape="point")
+    dot.edge('arr', aut.initial_state.id, shape="arrow")
+
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
     graph.write_png(f'src/static/pics/{name}.png')

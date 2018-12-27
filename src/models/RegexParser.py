@@ -3,6 +3,7 @@ import pydot
 
 from src.models.StateGenerator import *
 from src.models.Automaton import Automaton
+from src.models.utils import swap_node_shape
 
 
 class Counter:
@@ -23,8 +24,15 @@ operators = {
 def parse_regex(expression):
     counter = Counter()
     dot = Digraph()
+    dot.attr(rankdir='TB')
     data = _generate_automaton(_remove_expression_whitespaces(expression), dot, counter)
     data['final'].is_final = True
+    swap_node_shape(dot, data['final'].id, "doublecircle")
+
+    # begging arrow
+    dot.node('arr', '', shape="point")
+    dot.edge('arr', data['initial'].id, shape="arrow")
+
     aut = Automaton('', data['initial'])
     name = str(id(aut))
     dot.save(f'src/static/pics/{name}.gv')
@@ -43,7 +51,6 @@ def _generate_automaton(expression, dot, counter):
     try:
         index = _get_operator_comma_index(expression)
         operator = operators[expression[0]]
-        print(operator)
         if expression[0] == '*':
             return operator(
                 counter,

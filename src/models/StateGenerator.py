@@ -18,19 +18,19 @@ def generate_or(counter, data1, data2, dot):
     dot.node(initial_state.id, initial_state.name, shape='circle')
 
     initial_state.add_transition('_', data1['initial'])
-    dot.edge(initial_state.id, data1['initial'].id, 'ε')
+    dot.edge(initial_state.id, data1['initial'].id, label='ε')
 
     initial_state.add_transition('_', data2['initial'])
-    dot.edge(initial_state.id, data2['initial'].id, 'ε')
+    dot.edge(initial_state.id, data2['initial'].id, label='ε')
 
     final_state = State(counter)
     dot.node(final_state.id, final_state.name, shape='circle')
 
     data1['final'].add_transition('_', final_state)
-    dot.edge(data1['final'].id, final_state.id, 'ε')
+    dot.edge(data1['final'].id, final_state.id, label='ε')
 
     data2['final'].add_transition('_', final_state)
-    dot.edge(data2['final'].id, final_state.id, 'ε')
+    dot.edge(data2['final'].id, final_state.id, label='ε')
 
     return {
         'initial': initial_state,
@@ -39,7 +39,7 @@ def generate_or(counter, data1, data2, dot):
 
 def generate_concatenation(counter, data1, data2, dot):
     data1['final'].add_transition('_', data2['initial'])
-    dot.edge(data1['final'].id, data2['initial'].id, 'ε')
+    dot.edge(data1['final'].id, data2['initial'].id, label='ε')
 
     return {
         'initial': data1['initial'],
@@ -51,19 +51,19 @@ def generate_kleene(counter, data, dot):
     dot.node(initial_state.id, initial_state.name, shape='circle')
 
     initial_state.add_transition('_', data['initial'])
-    dot.edge(initial_state.id, data['initial'].id, 'ε')
+    dot.edge(initial_state.id, data['initial'].id, label='ε')
 
     final_state = State(counter)
     dot.node(final_state.id, final_state.name, shape='circle')
 
     data['final'].add_transition('_', final_state)
-    dot.edge(data['final'].id, final_state.id, 'ε')
+    dot.edge(data['final'].id, final_state.id, label='ε')
 
     initial_state.add_transition('_', final_state)
-    dot.edge(initial_state.id, final_state.id, 'ε')
+    dot.edge(initial_state.id, final_state.id, label='ε')
 
     data['final'].add_transition('_', data['initial'])
-    dot.edge(data['final'].id, data['initial'].id, 'ε')
+    dot.edge(data['final'].id, data['initial'].id, label='ε')
 
     return {
         'initial': initial_state,
