@@ -1,5 +1,6 @@
 from graphviz import Digraph
 import pydot
+from functools import reduce
 
 from src.models.Automaton import Automaton
 from src.models.State import State
@@ -56,8 +57,43 @@ def _add_transitions(states, dot):
                 if k is '_': dot.edge(value.id, transition.id, 'ε')
                 else: dot.edge(value.id, transition.id, k)
 
-
 def parse(text):
+    aut, arr = get_automaton(text)
+    return arr
+
+def parse_to_dfa(text):
+    aut, arr = get_automaton(text)
+    if arr[1]: return arr
+    else:
+        new = convert_to_dfa(aut)
+        rename_states(new)
+        dot = Digraph()
+        generate_dot_dfa_conversion([tup[0] for tup in new], dot)
+        name = new[0][0].name
+        dot.save(f'src/static/pics/{name}.gv')
+        (graph,) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
+        graph.write_png(f'src/static/pics/{name}.png')
+        return [name, True, arr[2], False, []]
+
+def rename_states(new):
+    i = 0
+    for tuple in new:
+        tuple[0].name = 'S' + str(i)
+        i = i + 1
+
+def generate_dot_dfa_conversion(states, dot):
+    print(states)
+    for state in states:
+        if state.is_final: dot.node(state.id, state.name, shape='doublecircle')
+        else: dot.node(state.id, state.name, shape='circle')
+    for state in states:
+        for key in state.transitions.keys():
+            dot.edge(state.id, state.transitions[key][0].id, key)
+    # beginning arrow
+    dot.node('arr', '', shape="point")
+    dot.edge('arr', states[0].id, shape="arrow")
+
+def get_automaton(text):
     alphabet = None
     states = None
     dot = Digraph()
@@ -113,11 +149,81 @@ def parse(text):
         possible_words = aut.get_all_words()
     name = str(id(aut))
 
-    # begging arrow
+    # beginning arrow
     dot.node('arr', '', shape="point")
     dot.edge('arr', aut.initial_state.id, shape="arrow")
 
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
     graph.write_png(f'src/static/pics/{name}.png')
-    return [name, is_dfa, evaluations, finite, possible_words]
+    return (aut, [name, is_dfa, evaluations, finite, possible_words])
+
+def convert_to_dfa(aut, new=None, iteration=None):
+    if new is None:
+        initial = State('initial')
+        new = [(initial, [aut.initial_state])]
+    if iteration is None: iteration = 0
+    if iteration < len(new):
+        sup = {}
+        for letter in aut.alphabet:
+            sup[letter] = get_states_for_letter(new[iteration][1], letter)
+        add_new_states(new, sup)
+        add_transitions(new, sup, iteration)
+        return convert_to_dfa(aut, new, iteration + 1)
+    else:
+        return new
+
+def add_transitions(new, sup, iteration):
+    state = new[iteration][0]
+    for key in sup.keys():
+        transition_state = find_state_from_superset(new, sup[key])
+        state.add_transition(key, transition_state)
+
+def find_state_from_superset(new, superset):
+    if len(superset) == 0: id = 0
+    else: id = reduce(lambda x, y: x + y, [int(s.id) for s in superset])
+    for tuple in new:
+        if tuple[0].id == str(id): return tuple[0]
+
+def add_new_states(new, sup):
+    for s_arr in sup.values():
+        if len(s_arr) == 0:
+            if not contains_state_with_id(new, 0):
+                new_state = State('0')
+                new_state.id = '0'
+                new.append((new_state, s_arr))
+        else:
+            id = reduce(lambda x, y: x + y, [int(state.id) for state in s_arr])
+            if not contains_state_with_id(new, id):
+                new_state = State('')
+                new_state.id = str(id)
+                new_state.is_final = contains_final_state(s_arr)
+                new.append((new_state, s_arr))
+
+def contains_final_state(states):
+    for state in states:
+        if state.is_final: return True
+    return False
+
+def contains_state_with_id(new, id):
+    for tuple in new:
+        if tuple[0].id == str(id): return True
+    return False
+
+def get_states_for_letter(states, letter, new_states=None, visited_states=None):
+    if new_states is None: new_states = []
+    if visited_states is None: temp_visited_states = []
+    else: temp_visited_states = visited_states[:]
+    for state in states:
+        temp_visited_states.append(state)
+        if '_' in state.transitions:
+            for s in state.transitions['_']:
+                if s in temp_visited_states: continue
+                get_states_for_letter([s], letter, new_states, temp_visited_states)
+        if letter in state.transitions: add_without_duplicates(new_states, state.transitions[letter])
+    return new_states
+
+def add_without_duplicates(arr1, arr2):
+    for state in arr2:
+        if state in arr1: continue
+        arr1.append(state)

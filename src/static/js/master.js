@@ -14,6 +14,20 @@ document.getElementById("submit").addEventListener("click", function () {
     }
 });
 
+document.getElementById("dfa").addEventListener("click", function () {
+    var text = document.getElementById("input").value;
+    if (text.length < 1) {
+        alert("Please provide input!");
+    } else {
+        document.getElementById("list-possible-words").style.display = "none";
+        document.getElementById("list-container").style.display = "none";
+        json = JSON.stringify({"text": text});
+        request.open("POST", "/to-dfa", true);
+        request.setRequestHeader("Content-Type", "application/json");
+        request.send(json);
+    }
+});
+
 document.getElementById("regex").addEventListener("click", function () {
     var text = document.getElementById("regex-input").value;
     if (text.length < 1) {
