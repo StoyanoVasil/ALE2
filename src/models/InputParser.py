@@ -69,7 +69,7 @@ def parse_to_dfa(text):
         rename_states(new)
         dot = Digraph()
         generate_dot_dfa_conversion([tup[0] for tup in new], dot)
-        name = new[0][0].name
+        name = new[0][0].id
         dot.save(f'src/static/pics/{name}.gv')
         (graph,) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
         graph.write_png(f'src/static/pics/{name}.png')
@@ -82,7 +82,6 @@ def rename_states(new):
         i = i + 1
 
 def generate_dot_dfa_conversion(states, dot):
-    print(states)
     for state in states:
         if state.is_final: dot.node(state.id, state.name, shape='doublecircle')
         else: dot.node(state.id, state.name, shape='circle')
