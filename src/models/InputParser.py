@@ -28,9 +28,12 @@ def parse_final(line, states):
     for f in final.split(','):
         states[f].is_final = True
 
-def parse_transition(initial_state, transition_state, states, dot):
+def parse_transition(initial_state, transition_state, states, dot, stack_ops=None):
     initial = initial_state.split(',')
-    states[initial[0]].add_transition(initial[1], states[transition_state])
+    if stack_ops:
+        states[initial[0]].add_transition(initial[1], (states[transition_state], stack_ops))
+    else:
+        states[initial[0]].add_transition(initial[1], states[transition_state])
 
 def check_if_dfa(states, alphabet):
     for key, value in states.items():
@@ -40,22 +43,26 @@ def check_if_dfa(states, alphabet):
             if len(transition) != 1: return False
     return True
 
-def generate_dot(states, dot):
+def generate_dot(states, dot, is_pda=None):
     # dot.attr(rankdir='LR')
     _add_states(states, dot)
-    _add_transitions(states, dot)
+    _add_transitions(states, dot, is_pda)
 
 def _add_states(states, dot):
     for key, value in states.items():
         if value.is_final: dot.node(value.id, value.name, shape='doublecircle')
         else: dot.node(value.id, value.name, shape='circle')
 
-def _add_transitions(states, dot):
+def _add_transitions(states, dot, is_pda):
     for key, value in states.items():
         for k, v in value.transitions.items():
             for transition in v:
-                if k is '_': dot.edge(value.id, transition.id, 'ε')
-                else: dot.edge(value.id, transition.id, k)
+                if is_pda:
+                    if k is '_': dot.edge(value.id, transition[0].id, f'ε {transition[1]}')
+                    else: dot.edge(value.id, transition[0].id, f'{k} {transition[1]}')
+                else:
+                    if k is '_': dot.edge(value.id, transition.id, 'ε')
+                    else: dot.edge(value.id, transition.id, k)
 
 def parse(text):
     aut, arr = get_automaton(text)
@@ -102,6 +109,7 @@ def get_automaton(text):
     words_marker = False
     words = []
     evaluations = []
+    pda = False
     for line in text.split('\n'):
         # remove whitespaces in beginning and end; reduce multiple whitespaces to one
         line = ' '.join(line.split())
@@ -114,17 +122,25 @@ def get_automaton(text):
 
         # handle line
         if line.startswith('alphabet:'): alphabet = parse_alphabet(line)
+        elif line.startswith('stack'): pda = True
         elif line.startswith('states:'): states = parse_states(line, dot)
         elif line.startswith('final:'): parse_final(line, states)
-        elif line.startswith('transitions:'):
-            transitions_marker = True
+        elif line.startswith('transitions:'): transitions_marker = True
         elif line.startswith('words:'):
             transitions_marker = False
             words_marker = True
         elif transitions_marker:
-            l = line.split(' ')
-            parse_transition(l[0], l[2], states, dot)
-            if l[0].split(',')[1] == '_': is_dfa = False
+            if pda:
+                line = ' '.join(line.split())
+                l = line.split(' ')
+                if '[' in line and ']' in line:
+                    parse_transition(l[0], l[3], states, dot, stack_ops=l[1])
+                else:
+                    parse_transition(l[0], l[2], states, dot, stack_ops='[_,_]')
+            else:
+                l = line.split(' ')
+                parse_transition(l[0], l[2], states, dot)
+                if l[0].split(',')[1] == '_': is_dfa = False
         elif words_marker:
             l = line.split(',')
             words.append((l[0], l[1]))
@@ -133,16 +149,19 @@ def get_automaton(text):
     if is_dfa:
         is_dfa = check_if_dfa(states, alphabet)
     for word in words:
-        accepted = aut.evaluate_word(word[0])
+        if pda:
+            accepted = []
+        else:
+            accepted = aut.evaluate_word(word[0])
         if accepted:
             if word[1] == 'y': evaluations.append([','.join(word), True])
             else: evaluations.append([','.join(word), False])
         else:
             if word[1] == 'y': evaluations.append([','.join(word), False])
             else: evaluations.append([','.join(word), True])
-    generate_dot(states, dot)
+    generate_dot(states, dot, is_pda=pda)
     if is_dfa: finite = False
-    else: finite = aut.is_finite()
+    else: finite = aut.is_finite() if not pda else False
     possible_words = []
     if finite:
         possible_words = aut.get_all_words()
