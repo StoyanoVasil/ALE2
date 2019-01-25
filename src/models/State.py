@@ -82,11 +82,11 @@ class State:
         if len(word) is 0:
             if len(stack) is 0 and self.is_final: return True
             else: return False
-        next_state = self.pda_determine_next_state(word[0], stack)
+        next_state = self._pda_determine_next_state(word[0], stack)
         if next_state: return next_state.pda_evaluate_word(word[1:], stack)
         else: return False
 
-    def pda_determine_next_state(self, letter, stack):
+    def _pda_determine_next_state(self, letter, stack):
         if letter in self.transitions:
             possible_tansitions = self.transitions[letter]
             for tuple in possible_tansitions:
