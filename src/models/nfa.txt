@@ -69,3 +69,21 @@ a,y
 ab,n
 bba,n
 end.
+
+#test5
+alphabet: abc
+stack: xy
+states: S,B,C
+final: C
+transitions:
+S,a [_,x] --> S
+S,_       --> B
+B,b [_,y] --> B
+B,_       --> C
+C,c [x,_] --> C
+C,c [y,_] --> C
+words:
+aaabbcccc,n
+abc,n
+end.
+

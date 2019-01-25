@@ -145,14 +145,11 @@ def get_automaton(text):
             l = line.split(',')
             words.append((l[0], l[1]))
 
-    aut = Automaton(alphabet, list(states.values())[0])
+    aut = Automaton(alphabet, list(states.values())[0], pda)
     if is_dfa:
         is_dfa = check_if_dfa(states, alphabet)
     for word in words:
-        if pda:
-            accepted = []
-        else:
-            accepted = aut.evaluate_word(word[0])
+        accepted = aut.evaluate_word(word[0])
         if accepted:
             if word[1] == 'y': evaluations.append([','.join(word), True])
             else: evaluations.append([','.join(word), False])
