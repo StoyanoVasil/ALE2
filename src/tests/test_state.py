@@ -141,5 +141,81 @@ class TestStateClass(unittest.TestCase):
 
         self.assertEqual(is_finite, False, 'State with letter multiple state loop does not return False when evaluating if finite')
 
+    # Test get_all_words
+    def test_get_all_words_walks_all_branches(self):
+        state1 = State('A')
+        state2 = State('B')
+        state3 = State('C')
+        state2.is_final = True
+        state3.is_final = True
+        state1.add_transition('a', state2)
+        state1.add_transition('b', state3)
+        words = []
 
+        state1.get_all_words(words)
 
+        self.assertEqual(len(words), 2, 'Number returned words is not as expected')
+        self.assertIn('a', words, 'Returned words does not contain expected words')
+        self.assertIn('b', words, 'Returned words does not contain expected words')
+
+    # Test pda_evaluate_word
+    def test_pda_evaluate_word_with_empty_word(self):
+        state = State('A')
+
+        # empty stack and state is final should return true
+        state.is_final = True
+        evaluation = state.pda_evaluate_word('', [])
+        self.assertEqual(evaluation, True, 'PDA word evaluate did not return True when stack is empty, state is final and word is empty')
+
+        # every other case should return false
+        evaluation = state.pda_evaluate_word('', ['a'])
+        self.assertEqual(evaluation, False, 'PDA word evaluate did not return False when stack is not empty, state is final and word is empty')
+
+        state.is_final = False
+        evaluation = state.pda_evaluate_word('', [])
+        self.assertEqual(evaluation, False, 'PDA word evaluate did not return False when stack is empty, state is not final and word is empty')
+
+        evaluation = state.pda_evaluate_word('', ['a'])
+        self.assertEqual(evaluation, False, 'PDA word evaluate did not return False when stack is not empty, state is not final and word is empty')
+
+    def test_pda_evaluate_word_returns_false_when_there_is_no_next_state(self):
+        state = State('A')
+        state.pda_determine_next_state = MagicMock(return_value=None)
+
+        evaluation = state.pda_evaluate_word('', [])
+
+        self.assertEqual(evaluation, False, 'When there is no next state the pda_evaluate_word does not return False')
+
+    def test_pda_evaluate_word_returns_proper_result_from_next_state(self):
+        state1 = State('A')
+        state2 = State('B')
+        state1.pda_determine_next_state = MagicMock(return_value=state2)
+        state2.pda_evaluate_word = MagicMock(return_value=True)
+
+        evaluation = state1.pda_evaluate_word('a', [])
+
+        self.assertEqual(evaluation, True, 'PDA evaluate word does not return expected result')
+
+    # Test pda_determine_next_state
+    def test_pda_determine_next_state_priorty(self):
+        root = State('A')
+        child1 = State('B')
+        child2 = State('C')
+        child3 = State('D')
+        child4 = State('E')
+        root.add_transition('a', (child1, '[x,_]'))
+        root.add_transition('a', (child2, '[_,x]'))
+        root.add_transition('_', (child3, '[x,_]'))
+        root.add_transition('_', (child4, '[_,X]'))
+
+        next_state = root.pda_determine_next_state('a', ['x'])
+        self.assertEqual(next_state, child1)
+
+        next_state = root.pda_determine_next_state('a', ['y'])
+        self.assertEqual(next_state, child2)
+
+        next_state = root.pda_determine_next_state('b', ['x'])
+        self.assertEqual(next_state, child3)
+
+        next_state = root.pda_determine_next_state('b', ['y'])
+        self.assertEqual(next_state, child4)
