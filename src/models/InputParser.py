@@ -69,10 +69,10 @@ def parse(text):
     return arr
 
 def parse_to_dfa(text):
-    aut, arr = get_automaton(text)
-    if arr[1]: return arr
+    arr = get_automaton(text)
+    if arr[1][1]: return arr[1]
     else:
-        new = convert_to_dfa(aut)
+        new = convert_to_dfa(arr[0])
         rename_states(new)
         dot = Digraph()
         generate_dot_dfa_conversion([tup[0] for tup in new], dot)
@@ -80,7 +80,20 @@ def parse_to_dfa(text):
         dot.save(f'src/static/pics/{name}.gv')
         (graph,) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
         graph.write_png(f'src/static/pics/{name}.png')
-        return [name, True, arr[2], False, []]
+        evaluations = []
+        for word in arr[2]:
+            accepted = new[0][0].evaluate_word(word[0])
+            if accepted:
+                if word[1] == 'y':
+                    evaluations.append([','.join(word), True])
+                else:
+                    evaluations.append([','.join(word), False])
+            else:
+                if word[1] == 'y':
+                    evaluations.append([','.join(word), False])
+                else:
+                    evaluations.append([','.join(word), True])
+        return [name, True, evaluations, False, []]
 
 def rename_states(new):
     i = 0
@@ -171,7 +184,7 @@ def get_automaton(text):
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')
     graph.write_png(f'src/static/pics/{name}.png')
-    return (aut, [name, is_dfa, evaluations, finite, possible_words])
+    return [aut, [name, is_dfa, evaluations, finite, possible_words], words]
 
 def convert_to_dfa(aut, new=None, iteration=None):
     if new is None:
