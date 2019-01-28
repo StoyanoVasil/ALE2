@@ -193,6 +193,7 @@ def convert_to_dfa(aut, new=None, iteration=None):
         get_epsilon_closure(aut.initial_state, epsilon_closure)
         initial.id = str(reduce(lambda x, y: x + y, [int(state.id) for state in epsilon_closure]))
         new = [(initial, epsilon_closure)]
+        if contains_final_state(epsilon_closure): initial.is_final = True
     if iteration is None: iteration = 0
     if iteration < len(new):
         sup = {}
