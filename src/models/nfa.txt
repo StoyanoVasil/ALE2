@@ -87,3 +87,16 @@ aaabbcccc,n
 abc,n
 end.
 
+#test6
+alphabet: abc
+states: q0,q1,q2
+final: q1
+transitions:
+q0,_ --> q1
+q0,a --> q0
+q1,_ --> q2
+q1,b --> q1
+q2,a --> q1
+q2,a --> q0
+q2,c --> q2
+end.

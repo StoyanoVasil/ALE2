@@ -176,7 +176,10 @@ def get_automaton(text):
 def convert_to_dfa(aut, new=None, iteration=None):
     if new is None:
         initial = State('initial')
-        new = [(initial, [aut.initial_state])]
+        epsilon_closure = []
+        get_epsilon_closure(aut.initial_state, epsilon_closure)
+        initial.id = str(reduce(lambda x, y: x + y, [int(state.id) for state in epsilon_closure]))
+        new = [(initial, epsilon_closure)]
     if iteration is None: iteration = 0
     if iteration < len(new):
         sup = {}
@@ -188,6 +191,14 @@ def convert_to_dfa(aut, new=None, iteration=None):
     else:
         return new
 
+def get_epsilon_closure(state, epsilon_closure):
+    if state not in epsilon_closure: epsilon_closure.append(state)
+    if '_' in state.transitions:
+        for transition in state.transitions['_']:
+            if transition not in epsilon_closure: epsilon_closure.append(transition)
+            get_epsilon_closure(transition, epsilon_closure)
+
+
 def add_transitions(new, sup, iteration):
     state = new[iteration][0]
     for key in sup.keys():
@@ -195,6 +206,8 @@ def add_transitions(new, sup, iteration):
         state.add_transition(key, transition_state)
 
 def find_state_from_superset(new, superset):
+    for state in superset:
+        get_epsilon_closure(state, superset)
     if len(superset) == 0: id = 0
     else: id = reduce(lambda x, y: x + y, [int(s.id) for s in superset])
     for tuple in new:
@@ -208,12 +221,15 @@ def add_new_states(new, sup):
                 new_state.id = '0'
                 new.append((new_state, s_arr))
         else:
-            id = reduce(lambda x, y: x + y, [int(state.id) for state in s_arr])
+            epsilon_closure = []
+            for state in s_arr:
+                get_epsilon_closure(state, epsilon_closure)
+            id = reduce(lambda x, y: x + y, [int(state.id) for state in epsilon_closure])
             if not contains_state_with_id(new, id):
                 new_state = State('')
                 new_state.id = str(id)
-                new_state.is_final = contains_final_state(s_arr)
-                new.append((new_state, s_arr))
+                new_state.is_final = contains_final_state(epsilon_closure)
+                new.append((new_state, epsilon_closure))
 
 def contains_final_state(states):
     for state in states:
