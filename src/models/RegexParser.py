@@ -33,7 +33,7 @@ def parse_regex(expression):
     dot.node('arr', '', shape="point")
     dot.edge('arr', data['initial'].id, shape="arrow")
 
-    aut = Automaton('', data['initial'])
+    aut = Automaton('', data['initial'], is_pda=False)
     name = str(id(aut))
     dot.save(f'src/static/pics/{name}.gv')
     (graph, ) = pydot.graph_from_dot_file(f'src/static/pics/{name}.gv')

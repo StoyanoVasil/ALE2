@@ -41,5 +41,5 @@ sure you are connected to the Internet for the Bootstrap CDN to work.
 
 1. Open a terminal in the root directory of the project
 2. Run `pipenv run coverage run -m unittest discover src/tests`
-3. To generate nice html output of the tests run `coverage html`
+3. To generate nice html output of the tests run `pipenv run coverage html`
 4. Navigate to folder `htmlcov` that was just generated and open `index.html`
